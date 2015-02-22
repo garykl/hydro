@@ -1,0 +1,74 @@
+<html DOCTYPE='html'><head><title></title></head><body>
+<head>
+  <title>testing main.js</title>
+  <script src='../ramda/dist/ramda.js' type='text/javascript'></script>
+  <script src='event.js' type='text/javascript'></script>
+  <script src='geometry.js' type='text/javascript'></script>
+  <script src='svg.js' type='text/javascript'></script>
+  <script src='hydro.js' type='text/javascript'></script>
+</head>
+<body bgcolor='#000000'>
+
+  <div id='plotDiv'>
+  </div>
+
+  <div id='descriptionText'></div>
+
+  <script type='text/javascript'>
+var width = 900;
+var height = 700;
+var svgns = 'http://www.w3.org/2000/svg';
+
+svg = SVG();
+
+var forces = [[500, 0], [-300, 0]];
+var positions = [[100, 200], [350, 300]];
+var oldPositions = [[100, 200], [350, 300]];
+
+document.body.onload = function () {
+  var elem = document.createElementNS (svgns, 'svg');
+  elem.setAttribute ('id', 'plotArea');
+  elem.setAttribute ('width', width);
+  elem.setAttribute ('height', height);
+
+  var waterArrows = R.map(function (toCart) {
+    var v = R.map(R.multiply(150), normalize(propagateForces(positions, forces, toCart)));
+    var angle = Math.atan2(v[1], v[0]);
+    var arrow = svg.group([svg.arrow([0, 0], [70, 0], {'fill': 'blue', 'stroke': 'orange'})]);
+    arrow = svg.transformGroup(arrow, 2.0, toCart, angle);
+    elem.appendChild(arrow);
+    return arrow;
+  }, R.xprod(R.map(R.multiply(100), R.range(0, 7)),
+    R.map(R.multiply(100), R.range(0, 7))));
+
+  var updateWater = function () {
+    R.map(function (args) {
+      var arrow = args[0];
+      var toCart = args[1];
+      var v = R.map(R.multiply(150), normalize(propagateForces(positions, forces, toCart)));
+      var angle = Math.atan2(v[1], v[0]);
+      arrow = svg.transformGroup(arrow, 2.0, toCart, angle);
+      return arrow;
+    }, R.zip(waterArrows,
+      R.xprod(R.map(R.multiply(100), R.range(0, 7)),
+        R.map(R.multiply(100), R.range(0, 7)))));
+  };
+
+  R.map(function (index) {
+    elem.appendChild(movable(
+          svg.arrow(positions[index],
+            forces[index],
+            {'fill': 'green', 'stroke': 'white'}),
+          function (translation) {
+            positions[index][0] = oldPositions[index][0] + translation[0];
+            positions[index][1] = oldPositions[index][1] + translation[1];
+            updateWater();
+          }));
+  }, R.range(0, positions.length));
+
+  document.getElementById('plotDiv').appendChild(elem);
+};
+
+  </script>
+
+</body></html>

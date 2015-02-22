@@ -1,0 +1,19 @@
+* description
+
+Interactive visualization of flowfields. Point forces (and later force dipoles) can
+be moved around while the flowfield is recalculated.
+Therefore an svg visualization library is implemented.
+
+* svg library
+
+** centered objects[0/1]
+
+All svg object shall be positioned at the origin. The orientation and position, as well
+as the scaling should be given as transformations.
+
+- [ ] Those transformation need nice selectors.
+
+
+* event library
+
+Either find an event library or create a very slim one.
