@@ -25,48 +25,72 @@ var forces = [[500, 0], [-300, 0]];
 var positions = [[100, 200], [350, 300]];
 var oldPositions = [[100, 200], [350, 300]];
 
+var elem = document.createElementNS (svgns, 'svg');
+
 document.body.onload = function () {
-  var elem = document.createElementNS (svgns, 'svg');
   elem.setAttribute ('id', 'plotArea');
   elem.setAttribute ('width', width);
   elem.setAttribute ('height', height);
 
+  var arrow = svg.arrow({'fill': 'white'});
+  arrow = svg.rotate(svg.scale(svg.translate(arrow, [200, 100]), 200), 40);
+
+  // elem.appendChild(arrow);
+  document.getElementById('plotDiv').appendChild(elem);
+
   var waterArrows = R.map(function (toCart) {
-    var v = R.map(R.multiply(150), normalize(propagateForces(positions, forces, toCart)));
+
+    var v = propagateForces(positions, forces, toCart);
     var angle = Math.atan2(v[1], v[0]);
-    var arrow = svg.group([svg.arrow([0, 0], [70, 0], {'fill': 'blue', 'stroke': 'orange'})]);
-    arrow = svg.transformGroup(arrow, 2.0, toCart, angle);
+    var arrow = svg.arrow({'fill': 'blue'});
+
+    arrow = svg.rotate(svg.translate(svg.scale(arrow, 100), toCart),
+                       180 * angle / Math.PI);
+
     elem.appendChild(arrow);
     return arrow;
+
   }, R.xprod(R.map(R.multiply(100), R.range(0, 7)),
-    R.map(R.multiply(100), R.range(0, 7))));
+             R.map(R.multiply(100), R.range(0, 7))));
 
   var updateWater = function () {
+
     R.map(function (args) {
       var arrow = args[0];
       var toCart = args[1];
-      var v = R.map(R.multiply(150), normalize(propagateForces(positions, forces, toCart)));
+      var v = propagateForces(positions, forces, toCart);
       var angle = Math.atan2(v[1], v[0]);
-      arrow = svg.transformGroup(arrow, 2.0, toCart, angle);
+      arrow = svg.rotate(svg.translate(svg.scale(arrow, 100), toCart),
+                         180 * angle / Math.PI);
       return arrow;
+
     }, R.zip(waterArrows,
-      R.xprod(R.map(R.multiply(100), R.range(0, 7)),
-        R.map(R.multiply(100), R.range(0, 7)))));
+             R.xprod(R.map(R.multiply(100), R.range(0, 7)),
+                     R.map(R.multiply(100), R.range(0, 7)))));
   };
 
   R.map(function (index) {
-    elem.appendChild(movable(
-          svg.arrow(positions[index],
-            forces[index],
-            {'fill': 'green', 'stroke': 'white'}),
+
+    var child = svg.translate(
+            svg.rotate(svg.scale(svg.arrow({'fill': 'red'}),
+                                 1 * vectorLength(forces[index])),
+                       180 * vectorOrientation(forces[index]) / Math.PI),
+            positions[index]);
+
+    elem.appendChild(movable(child,
+
           function (translation) {
             positions[index][0] = oldPositions[index][0] + translation[0];
             positions[index][1] = oldPositions[index][1] + translation[1];
             updateWater();
           }));
+
   }, R.range(0, positions.length));
 
-  document.getElementById('plotDiv').appendChild(elem);
+  //  document.getElementById('plotDiv').appendChild(elem);
+
+  //  svg.getTransform(waterArrows[0]);
+
 };
 
   </script>

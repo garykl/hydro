@@ -16,21 +16,20 @@ var whichButton = function (e) {
 }
 
 
-var movable = function (elem, releaseCallback) {
+var movable = function (elem, callback) {
 
   var translateFlag = false;
-  var rotateFlag = false;
   var position = undefined;
-  var translation = [0, 0];
-  var rotation = 0;
-  var rotationCenter = [0, 0];
-  var group = svg.group([elem], {'transform': 'translate(0, 0)'});
+  var translation = svg.getTransform(elem).translation;
+  var internalElem = elem;
+  var releaseCallback = function (translation) {
+      if (callback !== undefined) {
+          callback(translation);
+      }
+  }
 
   var transform = function () {
-    svg.update(
-      group,
-      {'transform':
-         'translate(' + translation[0] + ', ' + translation[1] + '), rotate(' + rotation + ', ' + rotationCenter[1] + ', ' + rotationCenter[1] + ')'});
+    svg.setTranslation(internalElem, translation);
   };
 
   transform();
@@ -41,11 +40,7 @@ var movable = function (elem, releaseCallback) {
       translateFlag = !translateFlag;
       position = [e.pageX, e.pageY];
     }
-    if (whichButton(e) === 'middle') {
-      rotateFlag = !rotateFlag;
-      rotationCenter = [e.pageX, e.pageY];
-    }
-    if (!translateFlag && !rotateFlag) {
+    if (!translateFlag) {
       releaseCallback(translation);
     }
   };
@@ -56,18 +51,13 @@ var movable = function (elem, releaseCallback) {
       position = [e.pageX, e.pageY];
       translation = [translation[0] + vector[0], translation[1] + vector[1]];
     }
-    if (rotateFlag) {
-      var vector = [e.pageX - rotationCenter[0], e.pageY - rotationCenter[1]];
-      rotation = 180 * Math.atan2(vector[1], vector[0]) / Math.PI;
-    }
     transform();
     releaseCallback(translation);
   };
 
-  //elem.onclick = toggleClickFlag;
   elem.onmousemove = move;
   elem.onmousedown = toggleClickFlag;
 
-  return group;
+  return internalElem;
 };
 
