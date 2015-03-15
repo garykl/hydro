@@ -6,12 +6,13 @@ Therefore an svg visualization library is implemented.
 
 * svg library
 
-** centered objects[1/1]
+** centered objects[1/2]
 
 All svg object shall be positioned at the origin. The orientation and position, as well
 as the scaling should be given as transformations.
 
 - [X] Those transformation need nice selectors.
+- [ ] think about transitions
 
 
 * event library
