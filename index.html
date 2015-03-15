@@ -15,15 +15,14 @@
   <div id='descriptionText'></div>
 
   <script type='text/javascript'>
-var width = 900;
-var height = 700;
+var width = 1500;
+var height = 1500;
 var svgns = 'http://www.w3.org/2000/svg';
 
 svg = SVG();
 
-var forces = [[500, 0], [-300, 0]];
-var positions = [[100, 200], [350, 300]];
-var oldPositions = [[100, 200], [350, 300]];
+var forces = [[500, 0], [500, 0], [-500, 0], [-500, 0]];
+var positions = [[200, 100], [1000, 100], [200, 800], [1000, 800]];
 
 var elem = document.createElementNS (svgns, 'svg');
 
@@ -44,14 +43,14 @@ document.body.onload = function () {
     var angle = Math.atan2(v[1], v[0]);
     var arrow = svg.arrow({'fill': 'blue'});
 
-    arrow = svg.rotate(svg.translate(svg.scale(arrow, 100), toCart),
+    arrow = svg.rotate(svg.translate(svg.scale(arrow, 250), toCart),
                        180 * angle / Math.PI);
 
     elem.appendChild(arrow);
     return arrow;
 
-  }, R.xprod(R.map(R.multiply(100), R.range(0, 7)),
-             R.map(R.multiply(100), R.range(0, 7))));
+  }, R.xprod(R.map(R.multiply(200), R.range(0, 7)),
+             R.map(R.multiply(200), R.range(0, 7))));
 
   var updateWater = function () {
 
@@ -60,13 +59,16 @@ document.body.onload = function () {
       var toCart = args[1];
       var v = propagateForces(positions, forces, toCart);
       var angle = Math.atan2(v[1], v[0]);
-      arrow = svg.rotate(svg.translate(svg.scale(arrow, 100), toCart),
-                         180 * angle / Math.PI);
+      arrow = svg.setRotation(
+                svg.setTranslation(
+                  svg.setScaling(arrow, 250),
+                  toCart),
+                180 * angle / Math.PI);
       return arrow;
 
     }, R.zip(waterArrows,
-             R.xprod(R.map(R.multiply(100), R.range(0, 7)),
-                     R.map(R.multiply(100), R.range(0, 7)))));
+             R.xprod(R.map(R.multiply(200), R.range(0, 7)),
+                     R.map(R.multiply(200), R.range(0, 7)))));
   };
 
   R.map(function (index) {
@@ -80,8 +82,8 @@ document.body.onload = function () {
     elem.appendChild(movable(child,
 
           function (translation) {
-            positions[index][0] = oldPositions[index][0] + translation[0];
-            positions[index][1] = oldPositions[index][1] + translation[1];
+            positions[index][0] = translation[0];
+            positions[index][1] = translation[1];
             updateWater();
           }));
 

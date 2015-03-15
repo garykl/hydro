@@ -18,46 +18,46 @@ var whichButton = function (e) {
 
 var movable = function (elem, callback) {
 
-  var translateFlag = false;
-  var position = undefined;
-  var translation = svg.getTransform(elem).translation;
-  var internalElem = elem;
-  var releaseCallback = function (translation) {
-      if (callback !== undefined) {
-          callback(translation);
-      }
-  }
-
-  var transform = function () {
-    svg.setTranslation(internalElem, translation);
-  };
-
-  transform();
-
-  var toggleClickFlag = function (e) {
-    var e = e || window.event;
-    if (whichButton(e) === 'left') {
-      translateFlag = !translateFlag;
-      position = [e.pageX, e.pageY];
+    var translateFlag = false;
+    var position = undefined;
+    var translation = svg.getTransform(elem).translation;
+    var internalElem = elem;
+    var releaseCallback = function (translation) {
+        if (callback !== undefined) {
+            callback(translation);
+        }
     }
-    if (!translateFlag) {
-      releaseCallback(translation);
-    }
-  };
 
-  var move = function (e) {
-    if (translateFlag) {
-      var vector = [e.pageX - position[0], e.pageY - position[1]];
-      position = [e.pageX, e.pageY];
-      translation = [translation[0] + vector[0], translation[1] + vector[1]];
-    }
+    var transform = function () {
+        svg.setTranslation(internalElem, translation);
+    };
+
     transform();
-    releaseCallback(translation);
-  };
 
-  elem.onmousemove = move;
-  elem.onmousedown = toggleClickFlag;
+    var toggleClickFlag = function (e) {
+        var e = e || window.event;
+        if (whichButton(e) === 'left') {
+            translateFlag = !translateFlag;
+            position = [e.pageX, e.pageY];
+        }
+        if (!translateFlag) {
+            releaseCallback(translation);
+        }
+    };
 
-  return internalElem;
+    var move = function (e) {
+        if (translateFlag) {
+            var vector = [e.pageX - position[0], e.pageY - position[1]];
+            position = [e.pageX, e.pageY];
+            translation = [translation[0] + vector[0], translation[1] + vector[1]];
+            transform();
+            releaseCallback(translation);
+        }
+    };
+
+    elem.onmousemove = move;
+    elem.onmousedown = toggleClickFlag;
+
+    return internalElem;
 };
 

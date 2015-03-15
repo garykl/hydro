@@ -44,7 +44,7 @@ var SVG = function () {
     };
 
 
-    var group = function (elems, attrs) {;
+    var group = function (elems, attrs) {
         var g = create('g', attrs)
             R.map(function (e) { g.appendChild(e); }, elems);
         return g;
@@ -202,6 +202,8 @@ var SVG = function () {
             rotate: rotate,
             scale: scale,
             getTransform: getTransform,
+            setRotation: setRotation,
+            setScaling: setScaling,
             setTranslation: setTranslation
     };
 };
